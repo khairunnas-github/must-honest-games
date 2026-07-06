@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: 10 11 15;
+  --surface: 18 20 26;
+  --border: 38 42 52;
+  --text: 232 234 238;
+  --muted: 148 154 166;
+  --neon: 125 211 252;
+  --amber: 245 191 66;
+  --danger: 239 98 98;
+}
+
+.light {
+  --bg: 246 247 250;
+  --surface: 255 255 255;
+  --border: 224 227 233;
+  --text: 20 22 28;
+  --muted: 100 106 118;
+  --neon: 14 138 178;
+  --amber: 180 120 10;
+  --danger: 200 50 50;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background-color: rgb(var(--bg));
+  color: rgb(var(--text));
+  font-family: "Inter", sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--border));
+  border-radius: 999px;
+}
+
+.card {
+  background-color: rgb(var(--surface));
+  border: 1px solid rgb(var(--border));
+  border-radius: 14px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgb(var(--border));
+  color: rgb(var(--muted));
+}
