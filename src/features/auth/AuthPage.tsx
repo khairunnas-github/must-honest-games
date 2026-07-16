@@ -45,7 +45,7 @@ export default function AuthPage() {
       <div className="w-full max-w-sm card p-6">
         <div className="flex items-center gap-2 mb-6 justify-center">
           <Gamepad2 className="text-neon" size={28} />
-          <h1 className="font-display font-semibold text-lg">Must Honest Game Library</h1>
+          <h1 className="font-display font-semibold text-lg">Must Honest Games</h1>
         </div>
 
         <form onSubmit={submit} className="flex flex-col gap-3">

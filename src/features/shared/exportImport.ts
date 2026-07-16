@@ -51,7 +51,7 @@ export function exportMarkdown(games: Game[]) {
     grouped[g.status] = grouped[g.status] ?? [];
     grouped[g.status].push(g);
   }
-  let md = "# Must Honest Game Library\n\n";
+  let md = "# Must Honest Games\n\n";
   for (const [status, list] of Object.entries(grouped)) {
     md += `## ${STATUS_LABEL[status as keyof typeof STATUS_LABEL] ?? status}\n\n`;
     for (const g of list) {
