@@ -1,4 +1,4 @@
-# Must Honest Games 🎮 v2.1
+# Honest Games 🎮 v2.1
 
 Game backlog tracker jujur, dengan struktur feature-based dan fitur lengkap:
 play sessions, priority backlog + random picker, tags, cost tracking,
@@ -33,7 +33,7 @@ Buka http://localhost:8080.
 ```bash
 git init
 git add .
-git commit -m "Must Honest Games v2.1 - restructured + new features"
+git commit -m "Honest Games v2.1 - restructured + new features"
 git branch -M main
 git remote add origin https://github.com/<username>/<repo>.git
 git push -u origin main

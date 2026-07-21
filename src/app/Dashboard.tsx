@@ -89,7 +89,7 @@ export default function Dashboard({ user }: { user: User }) {
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Gamepad2 className="text-neon" size={22} />
-            <h1 className="font-display font-semibold">Must Honest Games</h1>
+            <h1 className="font-display font-semibold">Honest Games</h1>
           </div>
           <div className="flex items-center gap-2">
             <NextUpPicker userId={user.id} onStarted={bump} />
