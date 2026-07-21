@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getStats } from "@/features/games/games";
 import { STATUS_LABEL } from "@/lib/types";
+import { useToast, runSafely } from "@/features/shared/Toast";
 
 interface Stats {
   byStatus: Record<string, number>;
@@ -12,10 +13,13 @@ interface Stats {
 }
 
 export default function StatsPanel({ userId, refreshKey }: { userId: string; refreshKey: number }) {
+  const toast = useToast();
   const [stats, setStats] = useState<Stats | null>(null);
 
   useEffect(() => {
-    getStats(userId).then(setStats).catch(() => {});
+    runSafely(toast, async () => {
+      setStats(await getStats(userId));
+    });
   }, [userId, refreshKey]);
 
   if (!stats) return null;
@@ -28,7 +32,7 @@ export default function StatsPanel({ userId, refreshKey }: { userId: string; ref
       label: "Rata-rata Rp/Jam",
       value: stats.avgValuePerHour != null ? `Rp ${stats.avgValuePerHour.toLocaleString("id-ID")}` : "-",
     },
-    { label: "Backlog Basi (>180 hr)", value: `${stats.staleBacklogCount}` },
+    { label: "Backlog Basi (>180 hari)", value: `${stats.staleBacklogCount}` },
   ];
 
   return (

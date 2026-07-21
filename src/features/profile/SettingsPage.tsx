@@ -77,22 +77,27 @@ export default function SettingsPage({ user }: { user: User }) {
             />
           </label>
 
-          <label className="text-xs text-muted flex flex-col gap-1">
+          <div className="text-xs text-muted flex flex-col gap-1">
             Mata Uang
-            <select
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value)}
-              className="bg-bg border border-border rounded-lg px-3 py-2 text-sm"
-            >
-              <option value="IDR">IDR (Rp)</option>
-              <option value="USD">USD ($)</option>
-            </select>
-          </label>
+            <div className="bg-bg border border-border rounded-lg px-3 py-2 text-text">
+              Rupiah (Rp)
+            </div>
+            <span className="text-[10px] text-muted/70">
+              Semua harga di aplikasi ini ditampilkan dalam Rupiah untuk saat ini.
+            </span>
+          </div>
 
           <label className="flex items-center gap-2 text-sm mt-1">
             <input type="checkbox" checked={isPublic} onChange={(e) => setIsPublic(e.target.checked)} />
-            Jadikan library ini publik (read-only, tanpa catatan pribadi & harga beli)
+            Jadikan koleksi ini publik (orang lain bisa lihat, tapi tidak bisa mengubah;
+            catatan pribadi & harga beli tetap disembunyikan)
           </label>
+
+          {isPublic && !username && (
+            <p className="text-[11px] text-amber">
+              Isi username dulu di atas biar link publik kamu muncul.
+            </p>
+          )}
 
           {isPublic && publicUrl && (
             <div className="flex items-center gap-2 text-xs bg-bg border border-border rounded-lg px-3 py-2">

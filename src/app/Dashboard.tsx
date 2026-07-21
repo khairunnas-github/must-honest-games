@@ -65,8 +65,12 @@ export default function Dashboard({ user }: { user: User }) {
     const patch: Partial<Game> = { status };
     if (status === "completed") patch.completed_at = new Date().toISOString().slice(0, 10);
     if (status === "playing") patch.started_at = new Date().toISOString().slice(0, 10);
-    await runSafely(toast, () => updateGame(id, patch).then(() => undefined));
-    bump();
+    const ok = await runSafely(
+      toast,
+      () => updateGame(id, patch).then(() => undefined),
+      `Status diubah ke "${STATUS_LABEL[status]}".`
+    );
+    if (ok) bump();
   }
 
   async function handleDelete(id: string) {
@@ -95,7 +99,11 @@ export default function Dashboard({ user }: { user: User }) {
             <Link to="/settings" className="text-muted hover:text-neon" title="Pengaturan">
               <Settings size={18} />
             </Link>
-            <button onClick={() => supabase.auth.signOut()} className="text-muted hover:text-danger">
+            <button
+              onClick={() => supabase.auth.signOut()}
+              className="text-muted hover:text-danger"
+              title="Keluar"
+            >
               <LogOut size={18} />
             </button>
           </div>

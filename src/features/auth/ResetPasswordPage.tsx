@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
+import { friendlyError } from "@/features/shared/friendlyError";
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState("");
@@ -13,7 +14,7 @@ export default function ResetPasswordPage() {
     setError(null);
     const { error } = await supabase.auth.updateUser({ password });
     if (error) {
-      setError(error.message);
+      setError(friendlyError(error));
       return;
     }
     setDone(true);
@@ -37,6 +38,7 @@ export default function ResetPasswordPage() {
               onChange={(e) => setPassword(e.target.value)}
               className="bg-bg border border-border rounded-lg px-3 py-2 text-sm outline-none focus:border-neon"
             />
+            <p className="text-[11px] text-muted -mt-2">Minimal 6 karakter.</p>
             {error && <p className="text-danger text-xs">{error}</p>}
             <button type="submit" className="bg-neon text-black rounded-lg py-2 text-sm font-medium">
               Simpan Password

@@ -29,8 +29,8 @@ export default function WrappedPage({ user }: { user: User }) {
         {loading && <p className="text-sm text-muted">Memuat...</p>}
         {!loading && years.length === 0 && (
           <p className="text-sm text-muted py-10 text-center">
-            Belum ada game yang ditandai selesai dengan tanggal completed. Selesaikan
-            beberapa game dulu, rekap tahunan bakal muncul di sini.
+            Belum ada game yang ditandai selesai lengkap dengan tanggal penyelesaian.
+            Selesaikan beberapa game dulu, rekap tahunan bakal muncul di sini.
           </p>
         )}
         {years.map((y) => (

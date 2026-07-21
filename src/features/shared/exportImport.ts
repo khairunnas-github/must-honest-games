@@ -73,13 +73,30 @@ export interface ImportRow {
   hours?: string;
 }
 
+const HEADER_ALIASES: Record<string, keyof ImportRow> = {
+  title: "title",
+  judul: "title",
+  status: "status",
+  platforms: "platforms",
+  platform: "platforms",
+  genres: "genres",
+  genre: "genres",
+  rating: "rating",
+  hours: "hours",
+  "jam main": "hours",
+  jam: "hours",
+};
+
 export function parseCsvImport(text: string): ImportRow[] {
   const lines = text.trim().split("\n");
   const header = lines[0].split(",").map((h) => h.trim().toLowerCase());
   return lines.slice(1).map((line) => {
     const cells = line.split(",");
     const row: Record<string, string> = {};
-    header.forEach((h, i) => (row[h] = (cells[i] ?? "").trim()));
+    header.forEach((h, i) => {
+      const key = HEADER_ALIASES[h];
+      if (key) row[key] = (cells[i] ?? "").trim();
+    });
     return row as unknown as ImportRow;
   });
 }

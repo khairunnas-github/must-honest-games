@@ -20,6 +20,7 @@ export default function SessionPanel({
   const [minutes, setMinutes] = useState(60);
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [note, setNote] = useState("");
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   async function reload() {
     setSessions(await fetchSessions(game.id));
@@ -44,7 +45,8 @@ export default function SessionPanel({
   }
 
   async function remove(id: string) {
-    const ok = await runSafely(toast, () => deleteSession(id));
+    const ok = await runSafely(toast, () => deleteSession(id), "Sesi dihapus.");
+    setConfirmDeleteId(null);
     if (ok) {
       await reload();
       onLogged();
@@ -61,21 +63,23 @@ export default function SessionPanel({
         <p className="text-xs text-muted mb-4">Total: {game.hours_played}h dari {sessions.length} sesi</p>
 
         <form onSubmit={submit} className="flex flex-col gap-2 mb-5">
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
               className="bg-bg border border-border rounded-lg px-2 py-1.5 text-sm flex-1"
             />
-            <input
-              type="number"
-              min={1}
-              value={minutes}
-              onChange={(e) => setMinutes(Number(e.target.value))}
-              className="bg-bg border border-border rounded-lg px-2 py-1.5 text-sm w-24"
-              placeholder="Menit"
-            />
+            <div className="flex items-center gap-1 bg-bg border border-border rounded-lg px-2 w-28">
+              <input
+                type="number"
+                min={1}
+                value={minutes}
+                onChange={(e) => setMinutes(Number(e.target.value))}
+                className="bg-transparent py-1.5 text-sm w-full outline-none"
+              />
+              <span className="text-xs text-muted shrink-0">menit</span>
+            </div>
           </div>
           <input
             value={note}
@@ -95,9 +99,24 @@ export default function SessionPanel({
                 <p>{s.session_date} — {Math.round((s.minutes_played / 60) * 10) / 10}h</p>
                 {s.note && <p className="text-xs text-muted">{s.note}</p>}
               </div>
-              <button onClick={() => remove(s.id)} className="text-muted hover:text-danger">
-                <Trash2 size={14} />
-              </button>
+              {confirmDeleteId === s.id ? (
+                <button
+                  onClick={() => remove(s.id)}
+                  onBlur={() => setConfirmDeleteId(null)}
+                  autoFocus
+                  className="text-danger text-[11px] border border-danger/40 rounded px-1.5 py-0.5 shrink-0"
+                >
+                  Yakin hapus?
+                </button>
+              ) : (
+                <button
+                  onClick={() => setConfirmDeleteId(s.id)}
+                  className="text-muted hover:text-danger"
+                  title="Hapus sesi ini"
+                >
+                  <Trash2 size={14} />
+                </button>
+              )}
             </div>
           ))}
           {sessions.length === 0 && <p className="text-xs text-muted">Belum ada sesi tercatat.</p>}

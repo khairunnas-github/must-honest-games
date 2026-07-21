@@ -60,7 +60,7 @@ export default function NextUpPicker({
                 )}
                 <h3 className="font-display font-semibold text-lg mb-1">{pick.title}</h3>
                 <p className="text-xs text-muted mb-4">
-                  Prioritas: {pick.priority} · {pick.platforms.join(", ") || "-"}
+                  Prioritas {pick.priority} · {pick.platforms.join(", ") || "Platform belum diisi"}
                 </p>
                 <div className="flex gap-2">
                   <button

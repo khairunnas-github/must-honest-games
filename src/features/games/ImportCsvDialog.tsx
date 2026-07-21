@@ -25,9 +25,17 @@ export default function ImportCsvDialog({
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
-      const parsed = parseCsvImport(String(reader.result));
-      setRows(parsed.filter((r) => r.title));
+      const parsed = parseCsvImport(String(reader.result)).filter((r) => r.title);
+      if (parsed.length === 0) {
+        toast.push(
+          "Tidak ada baris dengan judul yang bisa dibaca. Pastikan file punya kolom 'Judul' terisi.",
+          "error"
+        );
+        return;
+      }
+      setRows(parsed);
     };
+    reader.onerror = () => toast.push("Gagal membaca file. Coba file lain.", "error");
     reader.readAsText(file);
   }
 
@@ -65,10 +73,11 @@ export default function ImportCsvDialog({
         <button onClick={onClose} className="absolute top-4 right-4 text-muted">
           <X size={18} />
         </button>
-        <h3 className="font-display font-semibold text-lg mb-2">Import CSV</h3>
+        <h3 className="font-display font-semibold text-lg mb-2">Import dari File CSV</h3>
         <p className="text-xs text-muted mb-4">
-          Kolom yang didukung: title, status, platforms (pisah `;`), genres (pisah `;`), rating,
-          hours. Hanya `title` yang wajib.
+          Siapkan file CSV (bisa dibuat dari Excel/Google Sheets) dengan kolom: Judul (wajib
+          diisi), Status, Platform, Genre, Rating, dan Jam Main. Kalau ada beberapa platform
+          atau genre dalam satu game, pisahkan dengan tanda titik koma ( ; ).
         </p>
 
         <label className="flex items-center gap-2 border border-dashed border-border rounded-lg px-3 py-4 text-sm justify-center cursor-pointer mb-4">

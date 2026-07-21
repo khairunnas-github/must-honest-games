@@ -96,6 +96,9 @@ export default function EditGameDialog({
               onChange={(e) => setPriority(Number(e.target.value))}
               className="bg-bg border border-border rounded-lg px-2 py-1.5 text-sm text-text"
             />
+            <span className="text-[10px] text-muted/70">
+              Makin besar angkanya, makin sering muncul di "Pilihkan Aku Game".
+            </span>
           </label>
           <label className="text-xs text-muted flex flex-col gap-1 col-span-2">
             Harga Beli (Rp)
@@ -120,7 +123,7 @@ export default function EditGameDialog({
         </label>
 
         <label className="text-xs text-muted flex flex-col gap-1 mb-3">
-          Review / Journal
+          Ulasan / Jurnal Main
           <textarea
             value={review}
             onChange={(e) => setReview(e.target.value)}
@@ -131,7 +134,7 @@ export default function EditGameDialog({
         </label>
 
         <div className="mb-4">
-          <p className="text-xs text-muted mb-2">Tags</p>
+          <p className="text-xs text-muted mb-2">Tag</p>
           <div className="flex flex-wrap gap-2 mb-2">
             {allTags.map((t) => (
               <button

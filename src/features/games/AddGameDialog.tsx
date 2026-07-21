@@ -80,7 +80,7 @@ export default function AddGameDialog({
             onClick={() => setTab("search")}
             className={`px-3 py-1.5 rounded-lg ${tab === "search" ? "bg-neon text-black" : "border border-border"}`}
           >
-            Cari (RAWG)
+            Cari Online
           </button>
           <button
             onClick={() => setTab("manual")}
@@ -103,6 +103,12 @@ export default function AddGameDialog({
               />
             </div>
             {loading && <p className="text-xs text-muted">Mencari...</p>}
+            {!loading && debounced.trim() && results.length === 0 && (
+              <p className="text-xs text-muted">
+                Nggak ketemu game dengan judul itu. Coba kata kunci lain, atau tambah manual
+                lewat tab "Manual".
+              </p>
+            )}
             <div className="flex flex-col gap-2">
               {results.map((r) => (
                 <div key={r.external_id} className="flex items-center gap-3 border border-border rounded-lg p-2">

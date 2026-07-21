@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useState } from "react";
 import { CheckCircle2, XCircle, X } from "lucide-react";
+import { friendlyError } from "./friendlyError";
 
 interface ToastItem {
   id: number;
@@ -71,7 +72,7 @@ export async function runSafely(
     if (successMessage) toast.push(successMessage, "success");
     return true;
   } catch (err: any) {
-    toast.push(err?.message ?? "Terjadi kesalahan. Coba lagi.", "error");
+    toast.push(friendlyError(err), "error");
     return false;
   }
 }

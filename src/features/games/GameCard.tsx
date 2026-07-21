@@ -39,13 +39,24 @@ export default function GameCard({ game, onStatusChange, onDelete, onOpenSession
           >
             {game.title}
           </button>
-          <button
-            onClick={() => (confirmDelete ? onDelete(game.id) : setConfirmDelete(true))}
-            className="text-muted hover:text-danger shrink-0"
-            title="Hapus"
-          >
-            <Trash2 size={15} />
-          </button>
+          {confirmDelete ? (
+            <button
+              onClick={() => onDelete(game.id)}
+              onBlur={() => setConfirmDelete(false)}
+              autoFocus
+              className="text-danger text-[11px] border border-danger/40 rounded px-1.5 py-0.5 shrink-0"
+            >
+              Yakin hapus?
+            </button>
+          ) : (
+            <button
+              onClick={() => setConfirmDelete(true)}
+              className="text-muted hover:text-danger shrink-0"
+              title="Hapus game ini"
+            >
+              <Trash2 size={15} />
+            </button>
+          )}
         </div>
 
         <select
@@ -96,7 +107,7 @@ export default function GameCard({ game, onStatusChange, onDelete, onOpenSession
           onClick={() => onOpenSessions(game)}
           className="mt-auto flex items-center justify-center gap-1 text-xs border border-border rounded-lg py-1.5 hover:border-neon hover:text-neon transition"
         >
-          <PlayCircle size={14} /> Log Sesi
+          <PlayCircle size={14} /> Catat Waktu Main
         </button>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Gamepad2 } from "lucide-react";
+import { friendlyError } from "@/features/shared/friendlyError";
 
 type Mode = "login" | "register" | "forgot";
 
@@ -24,7 +25,7 @@ export default function AuthPage() {
       } else if (mode === "register") {
         const { error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
-        setInfo("Akun dibuat. Cek email untuk verifikasi (kalau diaktifkan) lalu login.");
+        setInfo("Akun berhasil dibuat. Cek email kamu untuk melanjutkan, lalu masuk di sini.");
         setMode("login");
       } else {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -34,7 +35,7 @@ export default function AuthPage() {
         setInfo("Link reset password sudah dikirim ke email kamu.");
       }
     } catch (err: any) {
-      setError(err.message ?? "Terjadi kesalahan.");
+      setError(friendlyError(err));
     } finally {
       setBusy(false);
     }
@@ -58,14 +59,20 @@ export default function AuthPage() {
             className="bg-bg border border-border rounded-lg px-3 py-2 text-sm outline-none focus:border-neon"
           />
           {mode !== "forgot" && (
-            <input
-              type="password"
-              required
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="bg-bg border border-border rounded-lg px-3 py-2 text-sm outline-none focus:border-neon"
-            />
+            <div className="flex flex-col gap-1">
+              <input
+                type="password"
+                required
+                minLength={mode === "register" ? 6 : undefined}
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="bg-bg border border-border rounded-lg px-3 py-2 text-sm outline-none focus:border-neon"
+              />
+              {mode === "register" && (
+                <p className="text-[11px] text-muted">Minimal 6 karakter.</p>
+              )}
+            </div>
           )}
 
           {error && <p className="text-danger text-xs">{error}</p>}
