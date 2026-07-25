@@ -38,7 +38,7 @@ export default function EditGameDialog({
 
   async function addNewTag() {
     if (!newTagName.trim()) return;
-    const colors = ["#7dd3fc", "#f5bf42", "#a78bfa", "#4ade80", "#f472b6"];
+    const colors = ["#FACC15", "#f5bf42", "#a78bfa", "#4ade80", "#f472b6"];
     const color = colors[Math.floor(Math.random() * colors.length)];
     const tag = await createTag(userId, newTagName.trim(), color);
     setAllTags((prev) => [...prev, tag]);

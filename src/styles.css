@@ -8,8 +8,8 @@
   --border: 38 42 52;
   --text: 232 234 238;
   --muted: 148 154 166;
-  --neon: 125 211 252;
-  --amber: 245 191 66;
+  --neon: 250 204 21; /* Honest Games primer: Kuning-mustard #FACC15 (App/UI) */
+  --amber: 217 119 6; /* Aksen sekunder: Amber Hangat #D97706 */
   --danger: 239 98 98;
 }
 
@@ -19,8 +19,8 @@
   --border: 224 227 233;
   --text: 20 22 28;
   --muted: 100 106 118;
-  --neon: 14 138 178;
-  --amber: 180 120 10;
+  --neon: 202 138 4; /* Brand/Logo #CA8A04 - kontras cukup di atas putih */
+  --amber: 133 77 14; /* Dark Mode shade #854D0E - kontras cukup di atas putih */
   --danger: 200 50 50;
 }
 
