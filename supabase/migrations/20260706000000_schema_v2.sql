@@ -1,5 +1,5 @@
 -- =====================================================================
--- MUST HONEST GAME LIBRARY — SCHEMA v2
+-- HONEST GAMES — SCHEMA v2
 -- Rebuild dari Backlog Buster dengan fitur tambahan:
 --   1. Play sessions (log sesi main, bukan cuma total jam)
 --   2. Tags/koleksi custom (many-to-many)

@@ -4,6 +4,26 @@ Game backlog tracker jujur, dengan struktur feature-based dan fitur lengkap:
 play sessions, priority backlog + random picker, tags, cost tracking,
 public share link, rekap tahunan, import CSV, dan toast feedback di semua aksi.
 
+## Dokumentasi
+
+Sesuai standar dokumentasi ekosistem Honest Series — `CLAUDE.md` di root cuma pointer tipis,
+isi aturan sebenarnya ada di `docs/`:
+
+```
+CLAUDE.md              (pointer tipis: @docs/Rules.md)
+docs/
+├── PRD.md              → visi produk, fitur MVP, catatan keamanan akses
+├── System.md           → design system + skema database + arsitektur teknis
+├── Rules.md            → aturan main untuk AI (tech stack, konvensi, larangan)
+├── Tasks.md            → papan kerja (backlog/in-progress/selesai)
+└── SDLC.md             → checklist SDLC khusus app ini
+```
+
+⚠️ **Catatan penting**: `docs/PRD.md` dan `docs/Rules.md` mendokumentasikan satu penyimpangan
+yang belum diputuskan — app ini punya sign-up publik multi-user plus fitur privasi granular
+(`profiles.is_public`), berbeda dari pola single-user standar ekosistem Honest Series. Baca
+bagian "Keamanan Akses" di `PRD.md` sebelum lanjut mengembangkan fitur auth/privasi.
+
 ## Setup
 
 ```bash
