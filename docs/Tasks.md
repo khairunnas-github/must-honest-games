@@ -2,9 +2,9 @@
 Papan kerja harian. AI mengambil task dari sini, mengerjakan, self-review (lihat Rules.md), lalu update status. User menambahkan feedback visual/QA di sini setelah mencoba hasilnya.
 
 ## 📋 Backlog (Prioritas Urut)
-- [ ] **Konfirmasi status sign-up publik + public profile** — putuskan apakah tetap multi-user
-      dengan opsi share publik (sesuai desain `is_public` yang sudah ada), atau disesuaikan ke
-      pola single-user ekosistem (lihat `PRD.md` Open Question)
+- [ ] **Hilangkan/tutup sign-up publik** (keputusan sudah diambil — kembali ke pola
+      single-user login-only). Perlu diputuskan juga: nasib fitur `is_public`/public profile
+      share link, apakah ikut dihapus atau dipertahankan sebagai fitur khusus akun tunggal itu.
 - [ ] Rate-limiting/proteksi untuk endpoint `/api/rawg-search` (saat ini proxy publik tanpa auth check)
 - [ ] Verifikasi loading state konsisten di semua fitur (search RAWG, import CSV preview, dsb)
 - [ ] Halaman pengaturan akun tambahan (ganti email/password, hapus akun) — cek apakah sudah ada di `/settings` atau baru sebagian

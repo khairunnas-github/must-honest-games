@@ -40,8 +40,7 @@ sepenuhnya mengikuti pola itu** — sama seperti yang sudah dicatat di Honest Wa
   yang mengonfirmasi ini sebagai pengecualian resmi dari filosofi single-user ekosistem.
 
 ## Catatan Open Question
-- [ ] **Konfirmasi**: apakah sign-up publik + fitur public profile di Honest Games ini
-      pengecualian yang disengaja (sama seperti dugaan di Honest Watch), atau perlu disesuaikan
-      ke pola single-user + login-only?
+- [x] ~~Konfirmasi: apakah sign-up publik...~~ **SUDAH DIPUTUSKAN**: sign-up publik akan
+      dihilangkan/ditutup, kembali ke pola single-user ekosistem. Lihat `Tasks.md` Backlog.
 - [ ] Kalau tetap multi-user: apakah perlu rate-limiting/moderasi untuk mencegah abuse pada
       endpoint `/api/rawg-search` (proxy publik ke RAWG, saat ini tanpa auth check)?
