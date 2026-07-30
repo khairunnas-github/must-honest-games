@@ -1,4 +1,4 @@
-# Honest Games 🎮 v2.7
+# Honest Games 🎮 v2.9
 
 Game backlog tracker jujur, dengan struktur feature-based dan fitur lengkap:
 play sessions, priority backlog + random picker, tags, cost tracking,
