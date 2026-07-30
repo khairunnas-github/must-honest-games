@@ -17,6 +17,13 @@ Papan kerja harian. AI mengambil task dari sini, mengerjakan, self-review (lihat
 *(user isi di sini setelah mencoba hasil build)*
 
 ## ✅ Selesai
+- [x] **Core PWA (Level 2) diimplementasikan** — manifest (`site.webmanifest`) ternyata
+      sudah ada sejak awal (icons 192/512/maskable lengkap); yang ditambahkan adalah
+      Service Worker via `vite-plugin-pwa` (`manifest: false`, pakai manifest statis yang
+      sudah ada, hindari duplikasi), halaman `public/offline.html` sebagai navigateFallback,
+      dan runtime caching CacheFirst untuk gambar cover RAWG (`rawg.io`/`media.rawg.io`,
+      30 hari). Diverifikasi lewat `npm run build` — `dist/sw.js` + `registerSW.js`
+      ter-generate, `dist/index.html` cuma satu link manifest (tidak dobel).
 - [x] Setup project (Vite + React + TypeScript + Tailwind + Supabase)
 - [x] Restructure ke feature-based (`src/features/{auth,games,sessions,stats,profile,shared}`) — v2.1
 - [x] Routing sungguhan dengan react-router-dom (`/`, `/settings`, `/wrapped`, `/u/:username`, `/reset-password`)

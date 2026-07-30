@@ -30,14 +30,19 @@
 - [x] Inisialisasi *repository* dan konfigurasi *environment* dasar.
 - [x] *Coding* fondasi aplikasi (routing react-router-dom, autentikasi).
 - [x] Pembuatan fitur inti dan integrasi *database* (CRUD, play sessions trigger, tags, views).
-- [ ] Optimalisasi performa dan *handling* fail besar/penyimpanan luring — belum ada IndexedDB/offline handling maupun PWA di app ini (beda dari Honest Watch yang sudah punya PWA minimal).
+- [x] Optimalisasi performa dan *handling* fail besar/penyimpanan luring — PWA (Level 2) sudah diimplementasikan (manifest + service worker + offline fallback + cache gambar RAWG). Belum ada IndexedDB untuk offline data penuh (di luar scope Level 2).
+
+**✅ UPDATE — Level PWA sekarang: Level 2 (Core PWA/Installable) tercapai.** Manifest
+(`site.webmanifest`) ternyata sudah ada sejak awal; Service Worker ditambahkan via
+`vite-plugin-pwa`. Sekarang setara dengan Honest Watch & Honest Career. Belum ke Level 3
+(Optimal/Fugu) — wajar, tidak jadi target untuk app kategori ini.
 
 ### 5. *Testing* (Pengujian)
 - [ ] *Unit Testing* untuk fungsi-fungsi kritikal — **belum ada** unit test formal, padahal ada
       logika trigger (`recalc_game_hours`) dan filter kolom publik yang cukup krusial untuk diuji.
 - [x] *User Acceptance Testing* (UAT) manual — tercermin dari histori v2.1 → v2.6 (restructure, retheme).
 - [ ] Pengujian aksesibilitas (kontras warna WCAG, keterbacaan teks) — belum ada verifikasi eksplisit tercatat, terutama untuk kontras kuning-mustard di light mode.
-- [ ] Pengujian fitur spesifik perangkat (unggah berkas, kapabilitas PWA) — Import CSV sudah ada (unggah berkas), tapi PWA belum diimplementasi sama sekali di app ini.
+- [x] Pengujian fitur spesifik perangkat (unggah berkas, kapabilitas PWA) — Import CSV (unggah berkas) sudah ada; kapabilitas PWA sudah bisa diuji sekarang (Level 2 tercapai), diverifikasi lewat build production (`dist/sw.js` ter-generate).
 
 ### 6. *Deployment* (Rilis)
 - [x] Pengaturan *Environment Variables* (ENV) untuk *production*.

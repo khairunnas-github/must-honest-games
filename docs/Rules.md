@@ -36,6 +36,11 @@ visual/UX, bukan level kode. AI bertanggung jawab penuh atas kualitas teknis.
   kolom sensitif (notes, review, price_paid) tidak ikut ter-expose tanpa sadar
 - Toast feedback wajib untuk semua aksi tulis (tambah/edit/hapus/log sesi/import) — pakai
   `src/features/shared/Toast.tsx`, jangan gagal diam-diam
+- **PWA**: manifest tetap `public/site.webmanifest` statis (jangan biarkan `vite-plugin-pwa`
+  generate manifest baru — set `manifest: false` di config, kalau tidak akan ada 2 manifest
+  yang bentrok). Setiap kali nambah asset baru yang perlu di-cache, tambahkan ke
+  `includeAssets` di `vite.config.ts`, dan `npm run build` untuk verifikasi `dist/sw.js`
+  ter-generate sebelum deploy.
 
 ## Yang TIDAK Boleh Dilakukan
 - Jangan expose credential/connection string/API key ke client-side

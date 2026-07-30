@@ -44,6 +44,10 @@ Series — penting khususnya untuk badge backlog aging, supaya tidak terasa meng
 - Loading state: perlu dicek konsisten di semua fitur (search RAWG, import CSV preview, dsb) — belum ada skeleton loader terdokumentasi eksplisit
 - Dark mode: `darkMode: 'class'` + toggle tersimpan di `profiles.theme` (`'dark'`/`'light'`) — sudah persist per user, bukan cuma preferensi sistem
 - Heatmap aktivitas: kalender kecil 12 minggu terakhir dari data `play_sessions`
+- **PWA (Level 2/Core PWA)**: `vite-plugin-pwa` (`manifest: false` — pakai `public/site.webmanifest`
+  statis yang sudah ada, hindari duplikasi manifest). Service worker auto-register
+  (`injectRegister: "auto"`), offline fallback `public/offline.html`, runtime cache CacheFirst
+  untuk gambar cover RAWG (30 hari). Config lengkap di `vite.config.ts`.
 
 ---
 

@@ -1,4 +1,4 @@
-# Honest Games 🎮 v2.1
+# Honest Games 🎮 v2.7
 
 Game backlog tracker jujur, dengan struktur feature-based dan fitur lengkap:
 play sessions, priority backlog + random picker, tags, cost tracking,
@@ -58,6 +58,13 @@ git branch -M main
 git remote add origin https://github.com/<username>/<repo>.git
 git push -u origin main
 ```
+
+## Yang baru di v2.7
+
+- **Core PWA (Level 2)**: Service Worker via `vite-plugin-pwa` (manifest statis yang
+  sudah ada dipertahankan, tidak digenerate ulang), halaman offline fallback, dan
+  runtime cache untuk gambar cover RAWG. App sekarang installable dengan dukungan
+  offline dasar, setara Honest Watch & Honest Career.
 
 ## Yang baru di v2.1
 
