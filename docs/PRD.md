@@ -24,23 +24,20 @@ sebagai satu-satunya app kategori "gim & interaktif" — tidak overlap dengan ap
 ## Integrasi ke App Lain
 Tidak ada. Honest Games berdiri sendiri, tidak berbagi data dengan app Honest Series lain.
 
-## Keamanan Akses — ⚠️ CATATAN PENYIMPANGAN DARI POLA EKOSISTEM
-Pola standar ekosistem Honest Series adalah **login-only, tanpa form pendaftaran publik**
-(akun dibuat manual lewat provider auth/database console). **Honest Games saat ini TIDAK
-sepenuhnya mengikuti pola itu** — sama seperti yang sudah dicatat di Honest Watch:
-- `AuthPage.tsx` punya mode `"register"` yang aktif dan bisa diakses siapa saja
-  ("Belum punya akun? Daftar").
-- Berbeda dari Honest Watch, di sini ada mekanisme **kontrol granular per-user**: kolom
-  `profiles.is_public` (default `false`) yang menentukan apakah backlog seorang user bisa
-  dilihat publik lewat halaman `/u/:username` (read-only, tanpa catatan pribadi/harga beli).
-  Jadi secara desain, app ini memang dipikirkan untuk skenario "banyak user, sebagian mau share
-  publik" — bukan cuma kebetulan sign-up-nya lupa ditutup.
-- Ini kemungkinan **pengecualian yang lebih disengaja** dibanding Honest Watch (ada fitur
-  privasi granular yang dibangun khusus untuk itu), tapi tetap belum ada keputusan tertulis
-  yang mengonfirmasi ini sebagai pengecualian resmi dari filosofi single-user ekosistem.
+## Keamanan Akses — ✅ Sudah Sesuai Pola Ekosistem (diperbaiki)
+Pola standar ekosistem Honest Series: **login-only, tanpa form pendaftaran publik**. Mode
+`"register"` di `AuthPage.tsx` sudah dihapus — sekarang cuma `"login"` dan `"forgot"`.
+
+**Catatan soal `profiles.is_public`**: kolom ini (kontrol privasi granular untuk share backlog
+lewat `/u/:username`) **tetap dipertahankan di skema**, tapi sekarang jadi fitur vestigial —
+karena tidak ada lagi jalur bikin akun baru, tidak akan pernah ada user lain yang bisa
+mengaktifkan ini selain akun tunggal yang sudah ada. Tidak berbahaya untuk dibiarkan (toggle-nya
+ada di Settings, default `false`), tapi kalau mau dirapikan sepenuhnya, halaman
+`/u/:username` dan toggle `is_public` bisa dihapus juga di iterasi berikutnya — belum
+dieksekusi sekarang karena bukan bagian dari permintaan ini.
 
 ## Catatan Open Question
-- [x] ~~Konfirmasi: apakah sign-up publik...~~ **SUDAH DIPUTUSKAN**: sign-up publik akan
-      dihilangkan/ditutup, kembali ke pola single-user ekosistem. Lihat `Tasks.md` Backlog.
+- [x] ~~Konfirmasi: apakah sign-up publik...~~ **SUDAH DIPUTUSKAN & DIEKSEKUSI**: mode
+      `"register"` dihapus dari `AuthPage.tsx`, kembali ke pola single-user ekosistem.
 - [ ] Kalau tetap multi-user: apakah perlu rate-limiting/moderasi untuk mencegah abuse pada
       endpoint `/api/rawg-search` (proxy publik ke RAWG, saat ini tanpa auth check)?

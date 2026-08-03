@@ -3,7 +3,11 @@ import { supabase } from "@/lib/supabase";
 import { Gamepad2 } from "lucide-react";
 import { friendlyError } from "@/features/shared/friendlyError";
 
-type Mode = "login" | "register" | "forgot";
+// Sengaja cuma "login" dan "forgot" — tanpa mode "register"/publik. App ini
+// single-user, akun dibuat sekali lewat Supabase Dashboard (Authentication >
+// Users > Add user), bukan lewat form pendaftaran publik yang bisa diakses
+// siapa aja yang tahu URL app. Lihat docs/PRD.md bagian "Keamanan Akses".
+type Mode = "login" | "forgot";
 
 export default function AuthPage() {
   const [mode, setMode] = useState<Mode>("login");
@@ -22,11 +26,6 @@ export default function AuthPage() {
       if (mode === "login") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-      } else if (mode === "register") {
-        const { error } = await supabase.auth.signUp({ email, password });
-        if (error) throw error;
-        setInfo("Akun berhasil dibuat. Cek email kamu untuk melanjutkan, lalu masuk di sini.");
-        setMode("login");
       } else {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/reset-password`,
@@ -59,20 +58,14 @@ export default function AuthPage() {
             className="bg-bg border border-border rounded-lg px-3 py-2 text-sm outline-none focus:border-neon"
           />
           {mode !== "forgot" && (
-            <div className="flex flex-col gap-1">
-              <input
-                type="password"
-                required
-                minLength={mode === "register" ? 6 : undefined}
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="bg-bg border border-border rounded-lg px-3 py-2 text-sm outline-none focus:border-neon"
-              />
-              {mode === "register" && (
-                <p className="text-[11px] text-muted">Minimal 6 karakter.</p>
-              )}
-            </div>
+            <input
+              type="password"
+              required
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="bg-bg border border-border rounded-lg px-3 py-2 text-sm outline-none focus:border-neon"
+            />
           )}
 
           {error && <p className="text-danger text-xs">{error}</p>}
@@ -83,17 +76,14 @@ export default function AuthPage() {
             disabled={busy}
             className="bg-neon/90 hover:bg-neon text-black font-medium rounded-lg py-2 text-sm transition disabled:opacity-50"
           >
-            {mode === "login" ? "Masuk" : mode === "register" ? "Daftar" : "Kirim link reset"}
+            {mode === "login" ? "Masuk" : "Kirim link reset"}
           </button>
         </form>
 
-        <div className="flex justify-between mt-4 text-xs text-muted">
-          {mode !== "login" ? (
-            <button onClick={() => setMode("login")}>Sudah punya akun? Masuk</button>
+        <div className="flex justify-end mt-4 text-xs text-muted">
+          {mode === "forgot" ? (
+            <button onClick={() => setMode("login")}>Kembali ke halaman masuk</button>
           ) : (
-            <button onClick={() => setMode("register")}>Belum punya akun? Daftar</button>
-          )}
-          {mode !== "forgot" && (
             <button onClick={() => setMode("forgot")}>Lupa password?</button>
           )}
         </div>
