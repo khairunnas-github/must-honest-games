@@ -20,14 +20,20 @@ export default function PublicProfilePage() {
   }, [username]);
 
   if (state === "loading") {
-    return <div className="min-h-screen flex items-center justify-center text-muted text-sm">Memuat...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center text-muted text-sm">
+        Memuat...
+      </div>
+    );
   }
 
   if (state === "notfound" || !data) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-3 text-muted text-sm">
-        <p>Library ini tidak ditemukan atau tidak publik.</p>
-        <Link to="/" className="text-neon">Kembali</Link>
+        <p>Library ini tidak ditemukan atau tidak dibagikan secara publik.</p>
+        <Link to="/" className="text-neon">
+          Kembali
+        </Link>
       </div>
     );
   }
@@ -70,6 +76,10 @@ export default function PublicProfilePage() {
             </div>
           ))}
         </div>
+
+        {data.games.length === 0 && (
+          <p className="text-sm text-muted text-center py-10">Library ini masih kosong.</p>
+        )}
       </main>
     </div>
   );

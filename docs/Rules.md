@@ -49,10 +49,10 @@ visual/UX, bukan level kode. AI bertanggung jawab penuh atas kualitas teknis.
 - Jangan gunakan nada menghakimi di microcopy, terutama untuk badge backlog aging (jangan
   terasa seperti menegur user karena "menumpuk" backlog)
 - ⚠️ **Soal form/tombol signup publik**: aturan standar ekosistem Honest Series melarang ini.
-  **Honest Games saat ini melanggar aturan ini** (mode `"register"` aktif di `AuthPage.tsx`),
-  dengan tambahan fitur privasi granular (`profiles.is_public`) yang mengindikasikan ini
-  desain yang disengaja. Status: **belum diputuskan resmi**. Jangan hapus/ubah fitur ini
-  secara sepihak — lihat `PRD.md` Open Question.
+  Honest Games sudah mengikuti aturan ini — mode `"register"` dihapus.
+  **Catatan penting**: `profiles.is_public` dan rute `/u/:username` adalah **share-link feature**,
+  bukan signup feature — keduanya independen dan tidak boleh dicampur. Share link berguna
+  agar kamu bisa berbagi progress library ke teman tanpa mereka perlu punya akun.
 
 ## Commit Convention
 - Format: `feat:`, `fix:`, `docs:`, `refactor:`, `style:`, `chore:` (Conventional Commits)

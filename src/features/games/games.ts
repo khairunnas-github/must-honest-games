@@ -6,6 +6,8 @@ export interface GameFilters {
   platforms?: string[];
   genres?: string[];
   tagIds?: string[];
+  minRating?: number;
+  minPriority?: number;
   search?: string;
   sort?: "recent" | "rating" | "hours" | "priority" | "value" | "aging";
   page?: number;
@@ -25,6 +27,8 @@ export async function fetchGames(userId: string, filters: GameFilters) {
   if (filters.platforms?.length) query = query.overlaps("platforms", filters.platforms);
   if (filters.genres?.length) query = query.overlaps("genres", filters.genres);
   if (filters.search) query = query.ilike("title", `%${filters.search}%`);
+  if (filters.minRating != null) query = query.gte("rating", filters.minRating);
+  if (filters.minPriority != null) query = query.gte("priority", filters.minPriority);
 
   switch (filters.sort) {
     case "rating":
@@ -131,7 +135,8 @@ export async function pickNextUp(userId: string) {
 export async function getStats(userId: string) {
   const { data, error } = await supabase
     .from("game_list")
-    .select("status, hours_played, rating, price_paid, genres, platforms, created_at");
+    .select("status, hours_played, rating, price_paid, genres, platforms, created_at")
+    .eq("user_id", userId);
   if (error) throw error;
   const rows = (data ?? []) as Pick<
     Game,
