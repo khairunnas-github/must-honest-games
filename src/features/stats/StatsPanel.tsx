@@ -74,7 +74,6 @@ export default function StatsPanel({ userId, refreshKey }: { userId: string; ref
           </div>
         ))}
       </div>
-      </div>
       <div className="flex flex-wrap gap-2 mb-4">
         {Object.entries(stats.byStatus).map(([status, count]) => (
           <span key={status} className="chip">

@@ -21,6 +21,9 @@ Papan kerja harian. AI mengambil task dari sini, mengerjakan, self-review (lihat
 *(user isi di sini setelah mencoba hasil build)*
 
 ## ✅ Selesai
+- [x] **Code Quality & Bug Fixes** — Memperbaiki beberapa error compiler (TypeScript):
+  - `StatsPanel.tsx`: Memperbaiki kelebihan tag penutup `</div>` yang menyebabkan error syntax (TS2657, TS1005).
+  - `Toast.tsx`: Memperbaiki tipe `runSafely` untuk mendukung return `Promise<any>` dari fungsi log sesi di `LiveTimer.tsx` (TS2322).
 - [x] **Full Bug Audit (2026-08-04)** — Memperbaiki 6 bug yang ditemukan di app:
   - `NextUpPicker`: Memperbaiki crash (TypeError) ketika property `platforms` null/undefined pada game manual.
   - `ImportCsvDialog`: Menambahkan loading state (skeleton) saat file CSV diparsing.
