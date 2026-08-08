@@ -38,7 +38,8 @@
 (Optimal/Fugu) — wajar, tidak jadi target untuk app kategori ini.
 
 ### 5. *Testing* (Pengujian)
-- [x] *Unit Testing* untuk fungsi-fungsi kritikal — **SUDAH ADA**: `profile.test.ts` dan `trigger.test.ts` diverifikasi berhasil dengan `vitest`.
+- [ ] *Unit Testing* untuk fungsi-fungsi kritikal — **belum ada** unit test formal, padahal ada
+      logika trigger (`recalc_game_hours`) dan filter kolom publik yang cukup krusial untuk diuji.
 - [x] *User Acceptance Testing* (UAT) manual — tercermin dari histori v2.1 → v2.6 (restructure, retheme).
 - [ ] Pengujian aksesibilitas (kontras warna WCAG, keterbacaan teks) — belum ada verifikasi eksplisit tercatat, terutama untuk kontras kuning-mustard di light mode.
 - [x] Pengujian fitur spesifik perangkat (unggah berkas, kapabilitas PWA) — Import CSV (unggah berkas) sudah ada; kapabilitas PWA sudah bisa diuji sekarang (Level 2 tercapai), diverifikasi lewat build production (`dist/sw.js` ter-generate).

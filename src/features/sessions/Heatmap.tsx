@@ -5,9 +5,7 @@ export default function Heatmap({ userId }: { userId: string }) {
   const [byDay, setByDay] = useState<Record<string, number>>({});
 
   useEffect(() => {
-    fetchHeatmap(userId, 12).then(setByDay).catch(() => {
-      // Gagal fetch heatmap — tampilkan heatmap kosong secara diam-diam
-    });
+    fetchHeatmap(userId, 12).then(setByDay);
   }, [userId]);
 
   const days: string[] = [];

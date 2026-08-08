@@ -1,15 +1,10 @@
 {
   "name": "Honest Games",
   "short_name": "Honest Games",
-  "description": "Game backlog tracker jujur — play sessions, prioritas, cost tracking, dan rekap tahunan.",
-  "lang": "id",
   "start_url": "/",
-  "scope": "/",
   "display": "standalone",
-  "orientation": "portrait-primary",
   "background_color": "#0a0b0f",
   "theme_color": "#EAB308",
-  "categories": ["games", "productivity"],
   "icons": [
     {
       "src": "/icon-192.png",

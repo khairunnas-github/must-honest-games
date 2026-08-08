@@ -4,7 +4,6 @@ import type { RawgResult, Status } from "@/lib/types";
 import { addGame, addGameFromRawg } from "@/features/games/games";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useToast, runSafely } from "@/features/shared/Toast";
-import { supabase } from "@/lib/supabase";
 
 export default function AddGameDialog({
   userId,
@@ -30,23 +29,17 @@ export default function AddGameDialog({
       return;
     }
     setLoading(true);
-
-    (async () => {
-      try {
-        const { data: sessionData } = await supabase.auth.getSession();
-        const token = sessionData.session?.access_token ?? "";
-        const r = await fetch(`/api/rawg-search?q=${encodeURIComponent(debounced)}`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        const data = await r.json();
+    fetch(`/api/rawg-search?q=${encodeURIComponent(debounced)}`)
+      .then((r) => r.json())
+      .then((data) => {
         if (!cancelled) setResults(data.results ?? []);
-      } catch {
+      })
+      .catch(() => {
         if (!cancelled) setResults([]);
-      } finally {
+      })
+      .finally(() => {
         if (!cancelled) setLoading(false);
-      }
-    })();
-
+      });
     return () => {
       cancelled = true;
     };
@@ -109,19 +102,7 @@ export default function AddGameDialog({
                 className="bg-transparent outline-none text-sm w-full"
               />
             </div>
-            {loading && (
-              <div className="flex flex-col gap-2">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-center gap-3 border border-border rounded-lg p-2 animate-pulse">
-                    <div className="w-12 h-12 bg-border rounded"></div>
-                    <div className="flex-1 min-w-0 flex flex-col gap-2">
-                      <div className="h-3 bg-border rounded w-3/4"></div>
-                      <div className="h-2 bg-border rounded w-1/2"></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            {loading && <p className="text-xs text-muted">Mencari...</p>}
             {!loading && debounced.trim() && results.length === 0 && (
               <p className="text-xs text-muted">
                 Nggak ketemu game dengan judul itu. Coba kata kunci lain, atau tambah manual

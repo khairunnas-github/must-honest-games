@@ -64,7 +64,7 @@ export function useToast() {
 /** Wraps an async action, shows an error toast on failure and returns whether it succeeded. */
 export async function runSafely(
   toast: ToastContextValue,
-  action: () => Promise<any>,
+  action: () => Promise<void>,
   successMessage?: string
 ) {
   try {

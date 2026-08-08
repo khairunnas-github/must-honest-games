@@ -128,12 +128,6 @@ catatan Keamanan Akses di `PRD.md`).
   tidak pernah sampai ke browser bundle
 - Sisanya (CRUD game_list, play_sessions, tags) langsung client → Supabase lewat RLS
 
-### Pengujian (Testing)
-- **Vitest** digunakan untuk pengujian logika kritis:
-  - `profile.test.ts`: Memastikan filter kolom publik (`getPublicProfileByUsername`) tidak membocorkan data sensitif.
-  - `trigger.test.ts`: Memastikan trigger SQL `recalc_game_hours` berjalan sesuai ekspektasi (setup mock DB & Supabase Key diperlukan).
-- Semua kueri seperti `getStats` secara ketat dieksekusi dengan `.eq("user_id", userId)` untuk mencegah kebocoran RLS/kalkulasi meskipun berjalan di *anon key*.
-
 ### Deploy
 - Vercel, ENV: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (client-side), `RAWG_API_KEY` (server-only, tanpa prefix `VITE_`)
 - `vercel.json` — rewrite `/api/*` ke serverless function, semua route lain fallback ke `index.html` (SPA routing)

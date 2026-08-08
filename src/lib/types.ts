@@ -32,7 +32,6 @@ export interface Game {
   platforms: string[];
   genres: string[];
   status: Status;
-  completion_category: "main" | "main_extra" | "100" | null;
   hours_played: number;
   rating: number | null;
   release_year: number | null;
@@ -43,6 +42,7 @@ export interface Game {
   external_id: string | null;
   priority: number;
   price_paid: number | null;
+  completion_percent: number | null;
   started_at: string | null;
   completed_at: string | null;
   last_played_at: string | null;
@@ -65,7 +65,6 @@ export interface PlaySession {
   session_date: string;
   minutes_played: number;
   note: string | null;
-  image_url: string | null;
   created_at: string;
 }
 
@@ -76,10 +75,7 @@ export interface Profile {
   avatar_url: string | null;
   theme: "dark" | "light";
   currency: string;
-  /** Apakah library bisa dibaca via link publik /u/:username — untuk share ke teman. */
   is_public: boolean;
-  /** Target jam main yang ingin dicapai dalam satu tahun. */
-  play_goal_hours: number | null;
 }
 
 export interface RawgResult {

@@ -1,43 +1,34 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { createClient } from "@supabase/supabase-js";
+
+// Rate limit sederhana per IP, in-memory (best-effort — reset saat cold start,
+// tidak akurat kalau ada banyak instance serverless paralel). Cukup untuk
+// menahan abuse/scraping kasar tanpa perlu tambah service eksternal seperti
+// Upstash Redis. Kalau traffic app ini besar nanti, upgrade ke rate limiter
+// berbasis Redis/KV yang konsisten lintas instance.
+const hits = new Map<string, number[]>();
+const WINDOW_MS = 60_000;
+const MAX_REQUESTS = 20;
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const timestamps = (hits.get(ip) ?? []).filter((t) => now - t < WINDOW_MS);
+  timestamps.push(now);
+  hits.set(ip, timestamps);
+  return timestamps.length > MAX_REQUESTS;
+}
 
 // Server-side proxy so RAWG_API_KEY never reaches the browser bundle.
-// Endpoint ini dilindungi: caller wajib kirim "Authorization: Bearer <supabase_access_token>".
-// Token diverifikasi langsung ke Supabase — siapa yang bukan user terotentikasi dapat 401.
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // ── 1. Verifikasi JWT Supabase ──────────────────────────────────────────────
-  const supabaseUrl = process.env.VITE_SUPABASE_URL;
-  const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return res.status(500).json({ error: "Konfigurasi Supabase server belum diset." });
+  const ip = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || "unknown";
+  if (isRateLimited(ip)) {
+    return res.status(429).json({ error: "Terlalu banyak permintaan. Coba lagi sebentar." });
   }
 
-  const authHeader = req.headers["authorization"] ?? "";
-  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
-
-  if (!token) {
-    return res.status(401).json({ error: "Tidak terotorisasi. Login dulu." });
-  }
-
-  // Buat client server-side untuk verifikasi JWT tanpa service role key.
-  // getUser(token) mem-verifikasi signature JWT ke Supabase Auth server.
-  const serverSupabase = createClient(supabaseUrl, supabaseAnonKey, {
-    global: { headers: { Authorization: `Bearer ${token}` } },
-  });
-  const { data: { user }, error: authErr } = await serverSupabase.auth.getUser(token);
-
-  if (authErr || !user) {
-    return res.status(401).json({ error: "Token tidak valid atau sudah kadaluarsa." });
-  }
-
-  // ── 2. Validasi parameter query ─────────────────────────────────────────────
   const q = (req.query.q as string) || "";
   if (!q.trim()) {
     return res.status(200).json({ results: [] });
   }
 
-  // ── 3. Panggil RAWG API ─────────────────────────────────────────────────────
   const apiKey = process.env.RAWG_API_KEY;
   if (!apiKey) {
     return res.status(500).json({ error: "RAWG_API_KEY belum diset di Vercel env vars." });
@@ -53,22 +44,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
     const data = await r.json();
 
-    const results = (data.results || []).map((g: {
-      id: number;
-      name: string;
-      background_image: string | null;
-      released: string | null;
-      metacritic: number | null;
-      platforms: { platform: { name: string } }[];
-      genres: { name: string }[];
-    }) => ({
+    const results = (data.results || []).map((g: any) => ({
       external_id: String(g.id),
       title: g.name,
       cover_url: g.background_image || null,
       release_year: g.released ? Number(g.released.slice(0, 4)) : null,
       metacritic_score: g.metacritic ?? null,
-      platforms: (g.platforms || []).map((p) => p.platform.name),
-      genres: (g.genres || []).map((genre) => genre.name),
+      platforms: (g.platforms || []).map((p: any) => p.platform.name),
+      genres: (g.genres || []).map((genre: any) => genre.name),
     }));
 
     return res.status(200).json({ results });

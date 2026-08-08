@@ -16,8 +16,7 @@ export async function logSession(
   gameId: string,
   minutes: number,
   date: string,
-  note?: string,
-  imageUrl?: string
+  note?: string
 ) {
   const { data, error } = await supabase
     .from("play_sessions")
@@ -27,7 +26,6 @@ export async function logSession(
       minutes_played: minutes,
       session_date: date,
       note: note ?? null,
-      image_url: imageUrl ?? null,
     })
     .select()
     .single();
@@ -55,23 +53,6 @@ export async function fetchHeatmap(userId: string, weeks = 12) {
     byDay[row.session_date] = (byDay[row.session_date] ?? 0) + row.minutes_played;
   }
   return byDay;
-}
-
-export async function fetchThisYearTotalHours(userId: string) {
-  const year = new Date().getFullYear();
-  const startOfYear = `${year}-01-01`;
-  const { data, error } = await supabase
-    .from("play_sessions")
-    .select("minutes_played")
-    .eq("user_id", userId)
-    .gte("session_date", startOfYear);
-  if (error) throw error;
-  
-  let totalMinutes = 0;
-  for (const row of data ?? []) {
-    totalMinutes += row.minutes_played;
-  }
-  return Math.round((totalMinutes / 60) * 10) / 10;
 }
 
 export async function fetchTags(userId: string) {

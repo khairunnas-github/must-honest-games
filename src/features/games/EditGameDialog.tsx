@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { X, Loader2 } from "lucide-react";
+import { X } from "lucide-react";
 import type { Game, Tag } from "@/lib/types";
 import { updateGame, setGameTags } from "@/features/games/games";
 import { fetchTags, createTag } from "@/features/sessions/sessions";
@@ -20,6 +20,7 @@ export default function EditGameDialog({
   const [rating, setRating] = useState(game.rating ?? "");
   const [priority, setPriority] = useState(game.priority);
   const [pricePaid, setPricePaid] = useState(game.price_paid ?? "");
+  const [completionPercent, setCompletionPercent] = useState(game.completion_percent ?? "");
   const [notes, setNotes] = useState(game.notes ?? "");
   const [review, setReview] = useState(game.review ?? "");
   const [allTags, setAllTags] = useState<Tag[]>([]);
@@ -27,13 +28,9 @@ export default function EditGameDialog({
     (game.tags ?? []).map((t) => t.id)
   );
   const [newTagName, setNewTagName] = useState("");
-  const [completionCategory, setCompletionCategory] = useState<"main" | "main_extra" | "100" | "">(
-    game.completion_category ?? ""
-  );
-  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    fetchTags(userId).then(setAllTags).catch(() => {});
+    fetchTags(userId).then(setAllTags);
   }, [userId]);
 
   function toggleTag(id: string) {
@@ -51,7 +48,6 @@ export default function EditGameDialog({
   }
 
   async function save() {
-    setBusy(true);
     const ok = await runSafely(
       toast,
       async () => {
@@ -59,7 +55,7 @@ export default function EditGameDialog({
           rating: rating === "" ? null : Number(rating),
           priority,
           price_paid: pricePaid === "" ? null : Number(pricePaid),
-          completion_category: completionCategory === "" ? null : completionCategory,
+          completion_percent: completionPercent === "" ? null : Number(completionPercent),
           notes: notes || null,
           review: review || null,
         });
@@ -67,7 +63,6 @@ export default function EditGameDialog({
       },
       "Perubahan disimpan."
     );
-    setBusy(false);
     if (ok) {
       onSaved();
       onClose();
@@ -117,23 +112,21 @@ export default function EditGameDialog({
               className="bg-bg border border-border rounded-lg px-2 py-1.5 text-sm text-text"
             />
           </label>
-        </div>
-
-        {game.status === "completed" && (
-          <label className="text-xs text-muted flex flex-col gap-1 mb-3">
-            Kategori Penuntasan
-            <select
-              value={completionCategory}
-              onChange={(e) => setCompletionCategory(e.target.value as any)}
-              className="bg-bg border border-border rounded-lg px-2 py-1.5 text-sm text-text outline-none"
-            >
-              <option value="">- Belum Ditentukan -</option>
-              <option value="main">Main Story Saja</option>
-              <option value="main_extra">Main Story + Ekstra</option>
-              <option value="100">100% Completion (Platinum)</option>
-            </select>
+          <label className="text-xs text-muted flex flex-col gap-1 col-span-2">
+            Progres Penyelesaian (%)
+            <input
+              type="number"
+              min={0}
+              max={100}
+              value={completionPercent}
+              onChange={(e) =>
+                setCompletionPercent(e.target.value === "" ? "" : Number(e.target.value))
+              }
+              placeholder="mis. 65"
+              className="bg-bg border border-border rounded-lg px-2 py-1.5 text-sm text-text"
+            />
           </label>
-        )}
+        </div>
 
         <label className="text-xs text-muted flex flex-col gap-1 mb-3">
           Catatan singkat
@@ -187,9 +180,8 @@ export default function EditGameDialog({
           </div>
         </div>
 
-        <button onClick={save} disabled={busy} className="w-full bg-neon text-black rounded-lg py-2 text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50">
-          {busy && <Loader2 size={16} className="animate-spin" />}
-          {busy ? "Menyimpan..." : "Simpan Perubahan"}
+        <button onClick={save} className="w-full bg-neon text-black rounded-lg py-2 text-sm font-medium">
+          Simpan Perubahan
         </button>
       </div>
     </div>

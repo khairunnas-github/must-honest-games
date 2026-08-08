@@ -18,11 +18,7 @@ export async function updateMyProfile(userId: string, patch: Partial<Profile>) {
   return data as Profile;
 }
 
-/**
- * Lookup publik berdasarkan username — hanya berhasil jika is_public = true.
- * RLS Supabase mengizinkan anon select hanya untuk profil yang is_public = true.
- * Kolom sensitif (notes, review, price_paid) TIDAK ikut diambil — select eksplisit.
- */
+/** Public lookup by username — relies on RLS allowing anon select when is_public = true. */
 export async function getPublicProfileByUsername(username: string) {
   const { data: profile, error } = await supabase
     .from("profiles")
@@ -33,7 +29,6 @@ export async function getPublicProfileByUsername(username: string) {
   if (error) throw error;
   if (!profile) return null;
 
-  // Select kolom publik saja — JANGAN pakai select("*") di sini karena anon bisa akses
   const { data: games, error: gamesError } = await supabase
     .from("game_list")
     .select("id, title, cover_url, platforms, genres, status, hours_played, rating, release_year")

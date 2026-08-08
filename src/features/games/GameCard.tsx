@@ -13,12 +13,6 @@ interface Props {
 
 const STATUSES: Status[] = ["wishlist", "backlog", "playing", "completed", "dropped", "shelved"];
 
-const CATEGORY_LABEL: Record<string, string> = {
-  main: "Main Story",
-  main_extra: "Main + Extra",
-  100: "100% (Platinum)",
-};
-
 export default function GameCard({ game, onStatusChange, onDelete, onOpenSessions, onEdit }: Props) {
   const [confirmDelete, setConfirmDelete] = useState(false);
 
@@ -89,15 +83,21 @@ export default function GameCard({ game, onStatusChange, onDelete, onOpenSession
           {valuePerHour != null && <span>Rp {valuePerHour.toLocaleString("id-ID")}/jam</span>}
         </div>
 
+        {game.completion_percent != null && (
+          <div className="flex items-center gap-2">
+            <div className="h-1.5 flex-1 bg-border rounded-full overflow-hidden">
+              <div
+                className="h-full bg-neon rounded-full"
+                style={{ width: `${game.completion_percent}%` }}
+              />
+            </div>
+            <span className="text-[10px] text-muted shrink-0">{game.completion_percent}%</span>
+          </div>
+        )}
+
         {isStale && (
           <span className="chip border-amber/40 text-amber w-fit">
             {daysInBacklog} hari di backlog
-          </span>
-        )}
-
-        {game.status === "completed" && game.completion_category && (
-          <span className="chip border-neon/40 text-neon w-fit">
-            {CATEGORY_LABEL[game.completion_category]}
           </span>
         )}
 

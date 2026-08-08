@@ -1,75 +1,38 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
 
-/**
- * DELETE /api/delete-account
- *
- * Menghapus akun pengguna secara permanen.
- * Membutuhkan:
- *   - Header "Authorization: Bearer <supabase_access_token>" (sama seperti rawg-search)
- *   - Env var SUPABASE_SERVICE_ROLE_KEY di Vercel (service role — jangan expose ke client!)
- *
- * Alur:
- *   1. Verifikasi JWT caller → dapat user.id
- *   2. Panggil auth.admin.deleteUser(user.id) via service role
- *   3. Cascade deletes di DB berjalan otomatis (profiles → game_list → play_sessions → tags)
- *   4. Client kemudian sign out
- *
- * CATATAN: SUPABASE_SERVICE_ROLE_KEY WAJIB ditambahkan di Vercel Dashboard →
- *   Settings → Environment Variables. JANGAN pernah expose key ini ke client-side.
- */
+// Endpoint ini butuh SUPABASE_SERVICE_ROLE_KEY (server-only, JANGAN pernah
+// pakai prefix VITE_ — kalau ke-expose ke client, siapa saja bisa hapus data
+// siapa saja). Verifikasi dulu token akses user sebelum menghapus akunnya
+// sendiri, supaya endpoint ini tidak bisa dipakai menghapus akun orang lain.
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== "DELETE") {
-    return res.status(405).json({ error: "Method tidak diizinkan." });
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const supabaseUrl = process.env.VITE_SUPABASE_URL;
-  const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return res.status(500).json({ error: "Konfigurasi Supabase server belum diset." });
-  }
-  if (!serviceRoleKey) {
-    return res.status(500).json({
-      error: "SUPABASE_SERVICE_ROLE_KEY belum diset di Vercel env vars.",
-    });
+  const authHeader = req.headers.authorization;
+  const accessToken = authHeader?.replace("Bearer ", "");
+  if (!accessToken) {
+    return res.status(401).json({ error: "Tidak ada sesi login." });
   }
 
-  // ── 1. Verifikasi JWT ────────────────────────────────────────────────────
-  const authHeader = req.headers["authorization"] ?? "";
-  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
-
-  if (!token) {
-    return res.status(401).json({ error: "Tidak terotorisasi. Login dulu." });
+  const url = process.env.VITE_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !serviceKey) {
+    return res.status(500).json({ error: "Server belum dikonfigurasi lengkap." });
   }
 
-  const anonClient = createClient(supabaseUrl, supabaseAnonKey, {
-    global: { headers: { Authorization: `Bearer ${token}` } },
-  });
-  const {
-    data: { user },
-    error: authErr,
-  } = await anonClient.auth.getUser(token);
+  const admin = createClient(url, serviceKey);
 
-  if (authErr || !user) {
-    return res.status(401).json({ error: "Token tidak valid atau sudah kadaluarsa." });
+  const { data: userData, error: userError } = await admin.auth.getUser(accessToken);
+  if (userError || !userData.user) {
+    return res.status(401).json({ error: "Sesi tidak valid." });
   }
 
-  // ── 2. Hapus akun via admin client ───────────────────────────────────────
-  // auth.admin.deleteUser() akan menghapus baris di auth.users → cascade ke
-  // profiles (ON DELETE CASCADE) → game_list → play_sessions, tags, game_tags.
-  try {
-    const adminClient = createClient(supabaseUrl, serviceRoleKey, {
-      auth: { autoRefreshToken: false, persistSession: false },
-    });
-
-    const { error: deleteError } = await adminClient.auth.admin.deleteUser(user.id);
-    if (deleteError) throw deleteError;
-
-    return res.status(200).json({ ok: true });
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Gagal menghapus akun.";
-    return res.status(500).json({ error: message });
+  const { error: deleteError } = await admin.auth.admin.deleteUser(userData.user.id);
+  if (deleteError) {
+    return res.status(500).json({ error: "Gagal menghapus akun." });
   }
+
+  return res.status(200).json({ ok: true });
 }

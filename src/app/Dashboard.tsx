@@ -1,8 +1,8 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { Link } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
-import { fetchGames, deleteGame, updateGame, type GameFilters } from "@/features/games/games";
+import { fetchGames, deleteGame, updateGame, getStats, type GameFilters } from "@/features/games/games";
 import type { Game, Status } from "@/lib/types";
 import { STATUS_LABEL } from "@/lib/types";
 import GameCard from "@/features/games/GameCard";
@@ -11,12 +11,10 @@ import AddGameDialog from "@/features/games/AddGameDialog";
 import ImportCsvDialog from "@/features/games/ImportCsvDialog";
 import NextUpPicker from "@/features/shared/NextUpPicker";
 import SessionPanel from "@/features/sessions/SessionPanel";
-import LiveTimer from "@/features/sessions/LiveTimer";
 import EditGameDialog from "@/features/games/EditGameDialog";
 import Heatmap from "@/features/sessions/Heatmap";
-import PwaPrompt from "@/features/shared/PwaPrompt";
 import { exportJson, exportCsv, exportMarkdown } from "@/features/shared/exportImport";
-import { Plus, LogOut, Gamepad2, Download, Settings, Sparkles, Upload, Menu, X } from "lucide-react";
+import { Plus, LogOut, Gamepad2, Download, Settings, Sparkles, Upload, AlertTriangle } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useToast, runSafely } from "@/features/shared/Toast";
 
@@ -28,44 +26,22 @@ export default function Dashboard({ user }: { user: User }) {
   const [count, setCount] = useState(0);
   const [page, setPage] = useState(0);
   const [statusFilter, setStatusFilter] = useState<Status | "">("");
-  const [platformFilter, setPlatformFilter] = useState<string>("");
-  const [minRating, setMinRating] = useState<string>("");
-  const [minPriority, setMinPriority] = useState<string>("");
-  const [showAdvanced, setShowAdvanced] = useState(false);
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 350);
   const [sort, setSort] = useState<GameFilters["sort"]>("recent");
   const [showAdd, setShowAdd] = useState(false);
   const [showImport, setShowImport] = useState(false);
   const [sessionGame, setSessionGame] = useState<Game | null>(null);
-  const [liveTimerGame, setLiveTimerGame] = useState<Game | null>(null);
   const [editGame, setEditGame] = useState<Game | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [loading, setLoading] = useState(true);
-
-  // Hamburger menu state (mobile)
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  // Tutup menu saat klik di luar
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
-      }
-    }
-    if (menuOpen) document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [menuOpen]);
+  const [staleCount, setStaleCount] = useState(0);
 
   async function load() {
     setLoading(true);
     await runSafely(toast, async () => {
       const { games, count } = await fetchGames(user.id, {
         status: statusFilter || undefined,
-        platforms: platformFilter ? [platformFilter] : undefined,
-        minRating: minRating ? Number(minRating) : undefined,
-        minPriority: minPriority ? Number(minPriority) : undefined,
         search: debouncedSearch || undefined,
         sort,
         page,
@@ -79,17 +55,12 @@ export default function Dashboard({ user }: { user: User }) {
 
   useEffect(() => {
     load();
-  }, [
-    user.id,
-    page,
-    statusFilter,
-    platformFilter,
-    minRating,
-    minPriority,
-    debouncedSearch,
-    sort,
-    refreshKey,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [statusFilter, debouncedSearch, sort, page, refreshKey]);
+
+  useEffect(() => {
+    getStats(user.id).then((s) => setStaleCount(s.staleBacklogCount)).catch(() => {});
+  }, [user.id, refreshKey]);
 
   function bump() {
     setRefreshKey((k) => k + 1);
@@ -121,14 +92,11 @@ export default function Dashboard({ user }: { user: User }) {
     <div className="min-h-screen">
       <header className="border-b border-border sticky top-0 bg-bg/90 backdrop-blur z-10">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          {/* Logo */}
           <div className="flex items-center gap-2">
             <Gamepad2 className="text-neon" size={22} />
             <h1 className="font-display font-semibold">Honest Games</h1>
           </div>
-
-          {/* Desktop nav — hidden di mobile */}
-          <div className="hidden md:flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <NextUpPicker userId={user.id} onStarted={bump} />
             <Link to="/wrapped" className="text-muted hover:text-neon" title="Rekap Tahunan">
               <Sparkles size={18} />
@@ -144,53 +112,20 @@ export default function Dashboard({ user }: { user: User }) {
               <LogOut size={18} />
             </button>
           </div>
-
-          {/* Mobile hamburger */}
-          <div className="md:hidden flex items-center gap-2" ref={menuRef}>
-            <NextUpPicker userId={user.id} onStarted={bump} />
-            <button
-              aria-label={menuOpen ? "Tutup menu" : "Buka menu"}
-              aria-expanded={menuOpen}
-              onClick={() => setMenuOpen((v) => !v)}
-              className="p-1.5 rounded-lg border border-border text-muted hover:text-neon hover:border-neon transition-colors"
-            >
-              {menuOpen ? <X size={18} /> : <Menu size={18} />}
-            </button>
-
-            {/* Dropdown menu */}
-            {menuOpen && (
-              <div className="absolute top-14 right-4 w-48 card py-1 shadow-xl z-20 border border-border">
-                <Link
-                  to="/wrapped"
-                  className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-surface transition-colors"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  <Sparkles size={15} className="text-muted" />
-                  Rekap Tahunan
-                </Link>
-                <Link
-                  to="/settings"
-                  className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-surface transition-colors"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  <Settings size={15} className="text-muted" />
-                  Pengaturan
-                </Link>
-                <hr className="border-border my-1" />
-                <button
-                  onClick={() => { supabase.auth.signOut(); setMenuOpen(false); }}
-                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-danger hover:bg-danger/10 transition-colors"
-                >
-                  <LogOut size={15} />
-                  Keluar
-                </button>
-              </div>
-            )}
-          </div>
         </div>
       </header>
 
       <main className="max-w-6xl mx-auto px-4 py-6 flex flex-col gap-5">
+        {staleCount > 0 && (
+          <div className="card p-3 flex items-center gap-2 border-amber/40 text-sm">
+            <AlertTriangle size={16} className="text-amber shrink-0" />
+            <span>
+              Ada <strong>{staleCount}</strong> game yang sudah &gt;180 hari nganggur di backlog.
+              Coba pakai "Pilihkan Aku Game" biar kepilih salah satunya.
+            </span>
+          </div>
+        )}
+
         <div className="grid md:grid-cols-3 gap-4 items-start">
           <div className="md:col-span-2">
             <StatsPanel userId={user.id} refreshKey={refreshKey} />
@@ -228,32 +163,6 @@ export default function Dashboard({ user }: { user: User }) {
             ))}
           </select>
 
-          <select
-            value={platformFilter}
-            onChange={(e) => {
-              setPlatformFilter(e.target.value);
-              setPage(0);
-            }}
-            className="bg-surface border border-border rounded-lg px-3 py-2 text-sm"
-          >
-            <option value="">Semua Platform</option>
-            <option value="PC">PC</option>
-            <option value="PlayStation 5">PlayStation 5</option>
-            <option value="PlayStation 4">PlayStation 4</option>
-            <option value="PlayStation 3">PlayStation 3</option>
-            <option value="Xbox Series S/X">Xbox Series S/X</option>
-            <option value="Xbox One">Xbox One</option>
-            <option value="Xbox 360">Xbox 360</option>
-            <option value="Nintendo Switch">Nintendo Switch</option>
-            <option value="Wii U">Wii U</option>
-            <option value="Wii">Wii</option>
-            <option value="Nintendo 3DS">Nintendo 3DS</option>
-            <option value="macOS">macOS</option>
-            <option value="Linux">Linux</option>
-            <option value="iOS">iOS</option>
-            <option value="Android">Android</option>
-          </select>
-
           <input
             value={search}
             onChange={(e) => {
@@ -275,15 +184,6 @@ export default function Dashboard({ user }: { user: User }) {
             <option value="priority">Prioritas</option>
             <option value="aging">Paling Lama di Backlog</option>
           </select>
-
-          <button
-            onClick={() => setShowAdvanced(!showAdvanced)}
-            className={`flex items-center gap-1 border rounded-lg px-3 py-2 text-sm transition ${
-              showAdvanced ? "border-neon text-neon" : "border-border hover:border-neon"
-            }`}
-          >
-            <Settings size={15} /> Advanced
-          </button>
 
           <div className="flex gap-1 ml-auto">
             <button
@@ -309,40 +209,6 @@ export default function Dashboard({ user }: { user: User }) {
             </button>
           </div>
         </div>
-
-        {showAdvanced && (
-          <div className="flex flex-wrap gap-2 mb-4 p-3 bg-surface/50 border border-border rounded-xl animate-in fade-in slide-in-from-top-2">
-            <label className="text-xs text-muted flex flex-col gap-1">
-              Min. Rating
-              <input
-                type="number"
-                min="0"
-                max="10"
-                value={minRating}
-                onChange={(e) => {
-                  setMinRating(e.target.value);
-                  setPage(0);
-                }}
-                placeholder="0-10"
-                className="bg-bg border border-border rounded-lg px-2 py-1.5 text-sm w-24 outline-none focus:border-neon"
-              />
-            </label>
-            <label className="text-xs text-muted flex flex-col gap-1">
-              Min. Prioritas
-              <input
-                type="number"
-                min="0"
-                value={minPriority}
-                onChange={(e) => {
-                  setMinPriority(e.target.value);
-                  setPage(0);
-                }}
-                placeholder="Angka"
-                className="bg-bg border border-border rounded-lg px-2 py-1.5 text-sm w-24 outline-none focus:border-neon"
-              />
-            </label>
-          </div>
-        )}
 
         {loading && <p className="text-sm text-muted">Memuat...</p>}
         {!loading && games.length === 0 && (
@@ -399,18 +265,6 @@ export default function Dashboard({ user }: { user: User }) {
           game={sessionGame}
           onClose={() => setSessionGame(null)}
           onLogged={bump}
-          onStartTimer={(g) => {
-            setLiveTimerGame(g);
-            setSessionGame(null);
-          }}
-        />
-      )}
-      {liveTimerGame && (
-        <LiveTimer 
-          game={liveTimerGame} 
-          userId={user.id} 
-          onClose={() => setLiveTimerGame(null)} 
-          onLogged={bump} 
         />
       )}
       {editGame && (
@@ -421,7 +275,6 @@ export default function Dashboard({ user }: { user: User }) {
           onSaved={bump}
         />
       )}
-      <PwaPrompt />
     </div>
   );
 }

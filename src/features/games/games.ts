@@ -6,8 +6,6 @@ export interface GameFilters {
   platforms?: string[];
   genres?: string[];
   tagIds?: string[];
-  minRating?: number;
-  minPriority?: number;
   search?: string;
   sort?: "recent" | "rating" | "hours" | "priority" | "value" | "aging";
   page?: number;
@@ -27,8 +25,6 @@ export async function fetchGames(userId: string, filters: GameFilters) {
   if (filters.platforms?.length) query = query.overlaps("platforms", filters.platforms);
   if (filters.genres?.length) query = query.overlaps("genres", filters.genres);
   if (filters.search) query = query.ilike("title", `%${filters.search}%`);
-  if (filters.minRating != null) query = query.gte("rating", filters.minRating);
-  if (filters.minPriority != null) query = query.gte("priority", filters.minPriority);
 
   switch (filters.sort) {
     case "rating":
@@ -111,6 +107,18 @@ export async function setGameTags(gameId: string, tagIds: string[]) {
   }
 }
 
+export function weightedPick<T>(items: T[], weightFn: (item: T) => number): T | null {
+  if (!items.length) return null;
+  const weights = items.map(weightFn);
+  const total = weights.reduce((a, b) => a + b, 0);
+  let r = Math.random() * total;
+  for (let i = 0; i < items.length; i++) {
+    r -= weights[i];
+    if (r <= 0) return items[i];
+  }
+  return items[items.length - 1];
+}
+
 export async function pickNextUp(userId: string) {
   const { data, error } = await supabase
     .from("game_list")
@@ -119,24 +127,14 @@ export async function pickNextUp(userId: string) {
     .in("status", ["backlog", "wishlist"]);
   if (error) throw error;
   const rows = (data ?? []) as Game[];
-  if (!rows.length) return null;
-
-  // Weighted random by priority (weight = priority + 1 so priority 0 can still be picked)
-  const weights = rows.map((g) => g.priority + 1);
-  const total = weights.reduce((a, b) => a + b, 0);
-  let r = Math.random() * total;
-  for (let i = 0; i < rows.length; i++) {
-    r -= weights[i];
-    if (r <= 0) return rows[i];
-  }
-  return rows[rows.length - 1];
+  // Weight = priority + 1 so priority 0 can still be picked
+  return weightedPick(rows, (g) => g.priority + 1);
 }
 
 export async function getStats(userId: string) {
   const { data, error } = await supabase
     .from("game_list")
-    .select("status, hours_played, rating, price_paid, genres, platforms, created_at")
-    .eq("user_id", userId);
+    .select("status, hours_played, rating, price_paid, genres, platforms, created_at");
   if (error) throw error;
   const rows = (data ?? []) as Pick<
     Game,

@@ -7,15 +7,10 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth
-      .getSession()
-      .then(({ data }) => {
-        setSession(data.session);
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setLoading(false);
+    });
     const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
       setSession(sess);
     });

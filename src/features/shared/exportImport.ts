@@ -76,71 +76,22 @@ export interface ImportRow {
 const HEADER_ALIASES: Record<string, keyof ImportRow> = {
   title: "title",
   judul: "title",
-  name: "title", // Steam
-
   status: "status",
-  "play status": "status", // Backloggd
-
   platforms: "platforms",
   platform: "platforms",
-  console: "platforms",
-
   genres: "genres",
   genre: "genres",
-
   rating: "rating",
-  score: "rating",
-  stars: "rating", // Backloggd
-
   hours: "hours",
   "jam main": "hours",
   jam: "hours",
-  playtime: "hours", // Steam
-  "hours played": "hours",
 };
-
-/**
- * Split satu baris CSV dengan respek terhadap quoted fields (RFC 4180).
- * Contoh: `"God of War, Ragnarök",backlog` → ["God of War, Ragnarök", "backlog"]
- */
-function splitCsvLine(line: string): string[] {
-  const result: string[] = [];
-  let current = "";
-  let inQuotes = false;
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if (inQuotes) {
-      if (ch === '"') {
-        // escaped quote ("") atau penutup kutipan
-        if (line[i + 1] === '"') {
-          current += '"';
-          i++;
-        } else {
-          inQuotes = false;
-        }
-      } else {
-        current += ch;
-      }
-    } else {
-      if (ch === '"') {
-        inQuotes = true;
-      } else if (ch === ",") {
-        result.push(current);
-        current = "";
-      } else {
-        current += ch;
-      }
-    }
-  }
-  result.push(current);
-  return result;
-}
 
 export function parseCsvImport(text: string): ImportRow[] {
   const lines = text.trim().split("\n");
   const header = lines[0].split(",").map((h) => h.trim().toLowerCase());
   return lines.slice(1).map((line) => {
-    const cells = splitCsvLine(line);
+    const cells = line.split(",");
     const row: Record<string, string> = {};
     header.forEach((h, i) => {
       const key = HEADER_ALIASES[h];

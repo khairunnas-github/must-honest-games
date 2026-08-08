@@ -9,20 +9,17 @@ export default function SessionPanel({
   game,
   onClose,
   onLogged,
-  onStartTimer,
 }: {
   userId: string;
   game: Game;
   onClose: () => void;
   onLogged: () => void;
-  onStartTimer?: (game: Game) => void;
 }) {
   const toast = useToast();
   const [sessions, setSessions] = useState<PlaySession[]>([]);
   const [minutes, setMinutes] = useState(60);
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [note, setNote] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   async function reload() {
@@ -37,12 +34,11 @@ export default function SessionPanel({
     e.preventDefault();
     const ok = await runSafely(
       toast,
-      () => logSession(userId, game.id, minutes, date, note || undefined, imageUrl || undefined).then(() => undefined),
+      () => logSession(userId, game.id, minutes, date, note || undefined).then(() => undefined),
       "Sesi disimpan."
     );
     if (ok) {
       setNote("");
-      setImageUrl("");
       await reload();
       onLogged();
     }
@@ -91,27 +87,7 @@ export default function SessionPanel({
             placeholder="Catatan singkat (opsional)"
             className="bg-bg border border-border rounded-lg px-2 py-1.5 text-sm"
           />
-          <input
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            placeholder="URL Gambar / Screenshot (opsional)"
-            className="bg-bg border border-border rounded-lg px-2 py-1.5 text-sm"
-          />
-
-          {onStartTimer && (
-            <button
-              type="button"
-              onClick={() => onStartTimer(game)}
-              className="mt-2 w-full border border-neon text-neon font-medium text-sm rounded-lg py-2 flex items-center justify-center gap-2 hover:bg-neon hover:text-black transition"
-            >
-              Mulai Timer Langsung
-            </button>
-          )}
-
-          <button
-            type="submit"
-            className="w-full bg-neon text-black font-semibold text-sm rounded-lg py-2 mt-4 hover:bg-white transition"
-          >
+          <button type="submit" className="bg-neon text-black rounded-lg py-2 text-sm font-medium">
             Simpan Sesi
           </button>
         </form>
@@ -122,9 +98,6 @@ export default function SessionPanel({
               <div>
                 <p>{s.session_date} — {Math.round((s.minutes_played / 60) * 10) / 10}h</p>
                 {s.note && <p className="text-xs text-muted">{s.note}</p>}
-                {s.image_url && (
-                  <img src={s.image_url} alt="Sesi" className="w-full h-auto max-h-32 object-cover rounded mt-2" />
-                )}
               </div>
               {confirmDeleteId === s.id ? (
                 <button
