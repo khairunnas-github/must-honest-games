@@ -38,7 +38,7 @@ export default function LiveTimer({
     const date = new Date().toISOString().slice(0, 10);
     const ok = await runSafely(
       toast, 
-      () => logSession(userId, game.id, minutes, date, "Live timer session"),
+      () => logSession(userId, game.id, minutes, date, "Live timer session").then(() => undefined),
       `Sesi ${minutes} menit disimpan.`
     );
     if (ok) {

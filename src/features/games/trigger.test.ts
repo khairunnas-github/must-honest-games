@@ -8,16 +8,23 @@ import { createClient } from '@supabase/supabase-js';
 // For local testing, you can usually find this by running `supabase status`.
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'http://127.0.0.1:54321';
-// Using anon key or service key. To bypass RLS and create users, service key is needed.
-// Defaulting to the known local anon key for testing if service key is missing, 
-// though profile insertion might fail if RLS blocks it without service key.
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
+// Butuh service role key untuk bypass RLS saat insert profile/game test —
+// anon key saja tidak cukup (RLS akan menolak insert tanpa sesi auth yang
+// cocok), jadi skip-nya harus berdasar keberadaan service role key, bukan
+// fallback ke anon key yang bisa bikin test "kelihatan jalan" padahal
+// sebenarnya cuma gagal connect/insert.
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
-// Skip tests if no key is provided (e.g. running in CI without setup)
+// Skip tests if no service role key is provided (e.g. running in CI without local Supabase setup)
 const runTest = SUPABASE_KEY ? describe : describe.skip;
 
 runTest('recalc_game_hours SQL Trigger', () => {
-  let supabase: ReturnType<typeof createClient>;
+  // Client mentah tanpa generic Database — sengaja `any`, karena file ini
+  // ngetes trigger SQL langsung, bukan lewat data layer app yang sudah
+  // ditipekan (src/features/games/games.ts dkk). Kalau dipaksa pakai tipe
+  // ketat di sini, TypeScript menganggap semua kolom tabel "never" karena
+  // client tidak dibuat dengan generic <Database>.
+  let supabase: any;
   const testUserId = 'test-user-' + Date.now();
   const testGameId = 'test-game-' + Date.now();
 
